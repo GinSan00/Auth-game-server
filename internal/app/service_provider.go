@@ -9,7 +9,11 @@ type serviceProvider struct {
 	config         config.Config
 	authRepository AuthRepository
 	authService    AuthService
+<<<<<<< HEAD
 	authImpl       AuthImplementation
+=======
+
+>>>>>>> 69d29c56bed276a06e37002410e387cb3e8ad9a3
 }
 
 func newServiceProvider() *serviceProvider {

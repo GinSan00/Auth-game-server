@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	fmt.Println("Serv")
 
 	cfg := config.MustLoad()
+	fmt.Println("Serv")
 }
