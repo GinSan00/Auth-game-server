@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"flag"
 	"os"
 	"time"
@@ -46,6 +47,25 @@ func MustLoad() *Config {
 	}
 
 	return &cfg
+}
+
+func Load() (*Config, error) {
+	path := fetchConfigPath()
+	if path == "" {
+		return nil, errors.New("Config path is empty")
+	}
+
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return nil, errors.New("Config file does not exist: " + path)
+	}
+
+	var cfg Config
+
+	if err := cleanenv.ReadConfig(path, &cfg); err != nil {
+		return nil, errors.New("Failed to read config: " + err.Error())
+	}
+
+	return &cfg, nil
 }
 
 func fetchConfigPath() string {

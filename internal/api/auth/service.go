@@ -3,7 +3,7 @@ package auth
 import (
 	"main/internal/service"
 
-	desc "github.com/ginsan00/auth-game-server/pkg/auth"
+	desc "github.com/GinSan00/Auth-game-server/pkg/authv1"
 )
 
 type Implementation struct {
@@ -13,5 +13,4 @@ type Implementation struct {
 
 func NewImplementation(authService service.AuthService) *Implementation {
 	return &Implementation{authService: authService}
-
 }
