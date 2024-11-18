@@ -3,7 +3,7 @@ package auth
 import (
 	"main/internal/service"
 
-	desc "github.com/GinSan00/Auth-game-server/pkg/authv1"
+	desc "github.com/GinSan00/auth-game-server/pkg/auth/authv1"
 )
 
 type Implementation struct {
