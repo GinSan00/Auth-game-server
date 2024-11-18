@@ -1,0 +1,17 @@
+env: "local"
+server:
+    addres: "localhost"
+    port: 8080
+    timeout: 10h
+
+database:
+    host: "localhost"
+    port: 5432
+    user: "postgres"
+    password: "postgres"
+    name: "postgres"
+
+redis:
+    host: "localhost"
+    port: 6379
+
