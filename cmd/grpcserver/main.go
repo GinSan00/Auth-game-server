@@ -1,7 +1,11 @@
 package main
 
-import "main/internal/config"
+import (
+	"fmt"
+	"main/internal/config"
+)
 
 func main() {
 	cfg := config.MustLoad()
+	fmt.Println("Server started")
 }
