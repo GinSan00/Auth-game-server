@@ -1,4 +1,6 @@
 env: "local"
+connection_string: "postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable"
+
 server:
     addres: "localhost"
     port: 8080

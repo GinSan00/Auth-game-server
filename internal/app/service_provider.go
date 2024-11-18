@@ -2,18 +2,19 @@ package app
 
 import (
 	"log"
+	"main/internal/api/auth"
 	"main/internal/config"
+	"main/internal/repository"
+	authRepository "main/internal/repository/auth/postgresql"
+	"main/internal/service"
+	authService "main/internal/service/auth"
 )
 
 type serviceProvider struct {
 	config         config.Config
-	authRepository AuthRepository
-	authService    AuthService
-<<<<<<< HEAD
-	authImpl       AuthImplementation
-=======
-
->>>>>>> 69d29c56bed276a06e37002410e387cb3e8ad9a3
+	authRepository repository.AuthRepository
+	authService    service.AuthService
+	authImpl       *auth.Implementation
 }
 
 func newServiceProvider() *serviceProvider {
@@ -27,31 +28,31 @@ func (s *serviceProvider) Config() config.Config {
 			log.Fatalf("Failed to load config: %v", err.Error())
 		}
 
-		s.config = cfg
+		s.config = *cfg
 	}
 
 	return s.config
 }
 
-func (s *serviceProvider) AuthRepository() AuthRepository {
+func (s *serviceProvider) AuthRepository() repository.AuthRepository {
 	if s.authRepository == nil {
-		s.authRepository = NewAuthRepository()
+		s.authRepository = authRepository.New(s.config.ConnectionString)
 	}
 
 	return s.authRepository
 }
 
-func (s *serviceProvider) AuthService() AuthService {
+func (s *serviceProvider) AuthService() service.AuthService {
 	if s.authService == nil {
-		s.authService = NewAuthService(s.AuthRepository())
+		s.authService = authService.NewService(s.AuthRepository())
 	}
 
 	return s.authService
 }
 
-func (s *serviceProvider) AuthImplementation() AuthImplementation {
+func (s *serviceProvider) AuthImplementation() *auth.Implementation {
 	if s.authImpl == nil {
-		s.authImpl = NewImplementation(s.AuthService())
+		s.authImpl = auth.NewImplementation(s.AuthService())
 	}
 
 	return s.authImpl

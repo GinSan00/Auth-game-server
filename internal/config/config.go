@@ -10,9 +10,10 @@ import (
 )
 
 type Config struct {
-	Env      string     `yaml:"env"`
-	Database Database   `yaml:"database"`
-	Server   GrpcServer `yaml:"server"`
+	Env              string     `yaml:"env"`
+	Database         Database   `yaml:"database"`
+	Server           GrpcServer `yaml:"server"`
+	ConnectionString string     `yaml:"connection_string"`
 }
 
 type GrpcServer struct {
