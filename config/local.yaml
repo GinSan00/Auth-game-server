@@ -1,5 +1,6 @@
 env: "local"
 connection_string: "postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable"
+token_ttl: "24h"
 
 server:
     addres: "localhost"

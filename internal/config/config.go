@@ -14,6 +14,7 @@ type Config struct {
 	Database         Database   `yaml:"database"`
 	Server           GrpcServer `yaml:"server"`
 	ConnectionString string     `yaml:"connection_string"`
+	TokenTTL         int        `yaml:"token_ttl"`
 }
 
 type GrpcServer struct {
