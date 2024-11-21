@@ -12,6 +12,7 @@ import (
 	"main/internal/model"
 	"main/internal/storage"
 
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -30,6 +31,7 @@ var (
 type UserSaver interface {
 	SaveUser(
 		ctx context.Context,
+		user_id string,
 		email string,
 		passHash []byte,
 		nickname string,
@@ -121,7 +123,9 @@ func (a *Auth) RegisterNewUser(ctx context.Context, email string, pass string, n
 		return 0, fmt.Errorf("%s: %w", op, err)
 	}
 
-	id, err := a.usrSaver.SaveUser(ctx, email, passHash, nickname, 0, time.Now(), time.Now())
+	user_id := uuid.New().String()
+
+	id, err := a.usrSaver.SaveUser(ctx, user_id, email, passHash, nickname, 0, time.Now(), time.Now())
 	if err != nil {
 		log.Error("failed to save user", sl.Err(err))
 

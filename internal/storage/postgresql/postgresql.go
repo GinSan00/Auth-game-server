@@ -31,10 +31,10 @@ func (s *Storage) Stop() error {
 }
 
 // SaveUser saves user to db.
-func (s *Storage) SaveUser(ctx context.Context, email string, passHash []byte, nickname string, elo uint, createdAt, lastLogin time.Time) (int64, error) {
+func (s *Storage) SaveUser(ctx context.Context, user_id string, email string, passHash []byte, nickname string, elo uint, createdAt, lastLogin time.Time) (int64, error) {
 	const op = "storage.postgresql.SaveUser"
 
-	stmt, err := s.db.PrepareContext(ctx, "INSERT INTO users(id,email, pass_hash, nickname, elo, created_at, last_login) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id")
+	stmt, err := s.db.PrepareContext(ctx, "INSERT INTO users(user_id,email, pass_hash, nickname, elo, created_at, last_login) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id")
 	if err != nil {
 		return 0, fmt.Errorf("%s: %w", op, err)
 	}
