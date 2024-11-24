@@ -2,10 +2,12 @@ package model
 
 import (
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type User struct {
-	ID        string
+	ID        uuid.UUID
 	Info      UserInfo
 	CreatedAt time.Time
 	LastLogin time.Time

@@ -11,7 +11,6 @@ import (
 
 type Config struct {
 	Env              string     `yaml:"env"`
-	Database         Database   `yaml:"database"`
 	Server           GrpcServer `yaml:"server"`
 	ConnectionString string     `yaml:"connection_string"`
 	TokenTTL         int        `yaml:"token_ttl"`
@@ -21,14 +20,6 @@ type GrpcServer struct {
 	Address string        `yaml:"address"`
 	Port    int           `yaml:"port"`
 	Timeout time.Duration `yaml:"timeout"`
-}
-
-type Database struct {
-	Host     string `yaml:"host"`
-	Port     int    `yaml:"port"`
-	User     string `yaml:"user"`
-	Password string `yaml:"password"`
-	Name     string `yaml:"name"`
 }
 
 // Не возвращает ошибку, вызывается только при запуске приложения

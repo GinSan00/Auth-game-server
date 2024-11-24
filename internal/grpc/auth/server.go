@@ -9,6 +9,7 @@ import (
 
 	authv1 "main/pkg/auth"
 
+	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -25,7 +26,7 @@ type Auth interface {
 		email string,
 		password string,
 		nickname string,
-	) (userID int64, err error)
+	) (userID uuid.UUID, err error)
 }
 
 type serverAPI struct {
@@ -82,5 +83,5 @@ func (s *serverAPI) Register(
 		return nil, status.Error(codes.Internal, "failed to register user")
 	}
 
-	return &authv1.RegisterResponse{UserId: uid}, nil
+	return &authv1.RegisterResponse{UserId: uid.String()}, nil
 }

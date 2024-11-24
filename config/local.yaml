@@ -1,18 +1,11 @@
 env: "local"
-connection_string: "postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable"
-token_ttl: "24h"
+connection_string: "postgres://postgres:1234@localhost:5432/voronkadb?sslmode=disable"
+token_ttl: 24
 
 server:
     addres: "localhost"
     port: 8080
     timeout: 10h
-
-database:
-    host: "localhost"
-    port: 5432
-    user: "postgres"
-    password: "postgres"
-    name: "postgres"
 
 redis:
     host: "localhost"

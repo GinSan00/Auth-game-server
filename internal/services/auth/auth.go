@@ -31,14 +31,14 @@ var (
 type UserSaver interface {
 	SaveUser(
 		ctx context.Context,
-		user_id string,
+		user_id uuid.UUID,
 		email string,
 		passHash []byte,
 		nickname string,
 		elo uint,
 		createdat time.Time,
 		lastlogin time.Time,
-	) (uid int64, err error)
+	) (uid uuid.UUID, err error)
 }
 
 type UserProvider interface {
@@ -106,7 +106,7 @@ func (a *Auth) Login(
 
 // RegisterNewUser registers new user in the system and returns user ID.
 // If user with given username already exists, returns error.
-func (a *Auth) RegisterNewUser(ctx context.Context, email string, pass string, nickname string) (int64, error) {
+func (a *Auth) RegisterNewUser(ctx context.Context, email string, pass string, nickname string) (uuid.UUID, error) {
 	const op = "Auth.RegisterNewUser"
 
 	log := a.log.With(
@@ -120,16 +120,16 @@ func (a *Auth) RegisterNewUser(ctx context.Context, email string, pass string, n
 	if err != nil {
 		log.Error("failed to generate password hash", sl.Err(err))
 
-		return 0, fmt.Errorf("%s: %w", op, err)
+		return uuid.Nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	user_id := uuid.New().String()
+	user_id := uuid.New()
 
 	id, err := a.usrSaver.SaveUser(ctx, user_id, email, passHash, nickname, 0, time.Now(), time.Now())
 	if err != nil {
 		log.Error("failed to save user", sl.Err(err))
 
-		return 0, fmt.Errorf("%s: %w", op, err)
+		return uuid.Nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	return id, nil

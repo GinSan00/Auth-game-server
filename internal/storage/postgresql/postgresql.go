@@ -9,6 +9,10 @@ import (
 
 	"main/internal/model"
 	"main/internal/storage"
+
+	_ "github.com/lib/pq"
+
+	"github.com/google/uuid"
 )
 
 type Storage struct {
@@ -31,26 +35,22 @@ func (s *Storage) Stop() error {
 }
 
 // SaveUser saves user to db.
-func (s *Storage) SaveUser(ctx context.Context, user_id string, email string, passHash []byte, nickname string, elo uint, createdAt, lastLogin time.Time) (int64, error) {
+func (s *Storage) SaveUser(ctx context.Context, user_id uuid.UUID, email string, passHash []byte, nickname string, elo uint, createdAt, lastLogin time.Time) (uuid.UUID, error) {
 	const op = "storage.postgresql.SaveUser"
 
-	stmt, err := s.db.PrepareContext(ctx, "INSERT INTO users(user_id,email, pass_hash, nickname, elo, created_at, last_login) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id")
+	stmt, err := s.db.PrepareContext(ctx, "INSERT INTO users(user_id,email, pass_hash, nickname, elo, created_at, last_login) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING user_id")
 	if err != nil {
-		return 0, fmt.Errorf("%s: %w", op, err)
+		return uuid.Nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	res, err := stmt.ExecContext(ctx, email, passHash)
+	var id uuid.UUID
+	err = stmt.QueryRowContext(ctx, user_id, email, passHash, nickname, elo, createdAt, lastLogin).Scan(&id)
 	if err != nil {
 		if pgErr, ok := err.(*pgError); ok && pgErr.Code == "23505" {
-			return 0, fmt.Errorf("%s: %w", op, storage.ErrUserExists)
+			return uuid.Nil, fmt.Errorf("%s: %w", op, storage.ErrUserExists)
 		}
 
-		return 0, fmt.Errorf("%s: %w", op, err)
-	}
-
-	id, err := res.LastInsertId()
-	if err != nil {
-		return 0, fmt.Errorf("%s: %w", op, err)
+		return uuid.Nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	return id, nil
@@ -60,12 +60,10 @@ func (s *Storage) SaveUser(ctx context.Context, user_id string, email string, pa
 func (s *Storage) User(ctx context.Context, email string) (model.User, error) {
 	const op = "storage.postgresql.User"
 
-	stmt, err := s.db.PrepareContext(ctx, "SELECT id, email, pass_hash FROM users WHERE email = $1")
+	stmt, err := s.db.PrepareContext(ctx, "SELECT user_id, email, pass_hash, nickname, elo, created_at, last_login FROM users WHERE email = $1")
 	if err != nil {
 		return model.User{}, fmt.Errorf("%s: %w", op, err)
 	}
-
-	row := stmt.QueryRowContext(ctx, email)
 
 	var user model.User
 	var (
@@ -75,9 +73,12 @@ func (s *Storage) User(ctx context.Context, email string) (model.User, error) {
 		elo       uint
 	)
 
-	err = row.Scan(&email, &passHash, &nickname, &elo)
+	err = stmt.QueryRowContext(ctx, email).Scan(&user.ID, &userEmail, &passHash, &nickname, &elo, &user.CreatedAt, &user.LastLogin)
 	if err != nil {
-		// ...
+		if errors.Is(err, sql.ErrNoRows) {
+			return model.User{}, fmt.Errorf("%s: %w", op, storage.ErrUserNotFound)
+		}
+		return model.User{}, fmt.Errorf("%s: %w", op, err)
 	}
 
 	user.Info = model.UserInfo{
@@ -85,14 +86,6 @@ func (s *Storage) User(ctx context.Context, email string) (model.User, error) {
 		PassHash: passHash,
 		Nickname: nickname,
 		Elo:      elo,
-	}
-
-	err = row.Scan(&user.ID, user.Info, &user.CreatedAt, &user.LastLogin)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return model.User{}, fmt.Errorf("%s: %w", op, storage.ErrUserNotFound)
-		}
-		return model.User{}, fmt.Errorf("%s: %w", op, err)
 	}
 
 	return user, nil
